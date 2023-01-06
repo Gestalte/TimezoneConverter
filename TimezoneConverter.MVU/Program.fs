@@ -104,26 +104,26 @@ let view (model:Model) (dispatch:Msg -> unit) =
     
     let gui = 
         Gui.app [
-            Gui.window "Demo" flags [
+            Gui.window "Timezone Converter" flags [
                 
                 Gui.text "Convert"
 
-                Gui.InputText "input" (ref model.InputText) (fun a -> InputTextChanged(a) |> dispatch) (fun a -> InputTextChanged(a) |> dispatch)
+                Gui.InputText "##input" (ref model.InputText) (fun a -> InputTextChanged(a) |> dispatch) (fun a -> InputTextChanged(a) |> dispatch)
 
                 Gui.text "From timezone" 
 
-                Gui.combobox "from-timezone" (ref model.SelectedFromTimezone) (fun a -> SelectedFromTimezoneChanged(a)|>dispatch) (TimezoneNames model)
+                Gui.combobox "##from-timezone" (ref model.SelectedFromTimezone) (fun a -> SelectedFromTimezoneChanged(a)|>dispatch) (TimezoneNames model)
 
                 Gui.text "To timezone"
 
-                Gui.combobox "to-timezone" (ref model.SelectedToTimezone) (fun a -> SelectedToTimezoneChanged(a)|>dispatch) (TimezoneNames model)
+                Gui.combobox "##to-timezone" (ref model.SelectedToTimezone) (fun a -> SelectedToTimezoneChanged(a)|>dispatch) (TimezoneNames model)
 
                 Gui.text ""
 
                 Gui.text model.Output
             ]
         ]
-    startOrUpdateGuiWith "Demo" gui |> ignore
+    startOrUpdateGuiWith "Timezone Converter" gui |> ignore
     resizeGui(550,180)
 
 Program.mkSimple init update view
