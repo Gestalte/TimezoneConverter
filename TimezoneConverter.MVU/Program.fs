@@ -44,21 +44,19 @@ let tryParseInt s =
     with :? FormatException -> 
         None
 
-let GetTime (input:string) : Converter.Time Option=
+let GetTime (input:string) : Converter.Time Option =
     let time = input
     let split = time.Split(':')
 
-    let hour = 
+    let parseTimePart (arr:string array) index =
         try
-            tryParseInt split[0]
+            tryParseInt arr[index]
         with :? Exception -> 
             None
 
-    let minute = 
-        try
-            tryParseInt split[1]
-        with :? Exception -> 
-            None
+    let hour = parseTimePart split 0
+
+    let minute = parseTimePart split 1
 
     if (hour.IsSome=false || minute.IsSome=false) then
         None
@@ -70,14 +68,15 @@ let GetTime (input:string) : Converter.Time Option=
 
 let Calc model =
     let time = GetTime model.InputText
-    let fromZone = 
-        match model.SelectedFromTimezone with
+
+    let makeZone input =
+        match input with
         | 0 -> None
-        | _ -> Converter.Conversions.GetTimezoneFromName (model.Timezones[model.SelectedFromTimezone-1]).Name
-    let toZone = 
-        match model.SelectedToTimezone with
-        | 0 -> None
-        | _ -> Converter.Conversions.GetTimezoneFromName (model.Timezones[model.SelectedToTimezone-1]).Name    
+        | _ -> Converter.Conversions.GetTimezoneFromName (model.Timezones[input-1]).Name
+
+    let fromZone = makeZone model.SelectedFromTimezone
+
+    let toZone = makeZone model.SelectedToTimezone
 
     match time with
     | None->""
@@ -95,25 +94,20 @@ let Calc model =
 let CalcOffset model =
     let time = GetTime model.InputText
 
-    let fOffset:Converter.Offset =
+    let getSign offset =
+        match offset with
+        | a when a >= 0 -> Converter.Sign.Plus
+        | _ -> Converter.Sign.Minus
+
+    let makeOffset (input:int) :Converter.Offset =
         {
-            Hours = Math.Abs(model.FromOffset)
+            Hours = Math.Abs(input)
             Minutes = 0
-            Sign =
-                match model.FromOffset with
-                | a when a >= 0 -> Converter.Sign.Plus
-                | _ -> Converter.Sign.Minus
+            Sign = getSign input
         }
 
-    let tOffset:Converter.Offset =
-        {
-            Hours = Math.Abs(model.ToOffset)
-            Minutes = 0
-            Sign =
-                match model.ToOffset with
-                | a when a >= 0 -> Converter.Sign.Plus
-                | _ -> Converter.Sign.Minus
-        }
+    let fOffset:Converter.Offset = makeOffset model.FromOffset
+    let tOffset:Converter.Offset = makeOffset model.ToOffset
 
     match time with
     | None -> ""
@@ -129,7 +123,7 @@ let SetModelOffset model =
 
 let update (msg: Msg) (model: Model) : Model =    
     match msg with 
-    | InputTextChanged input -> SetModel {model with InputText = input}
+    | InputTextChanged input -> SetModelOffset( SetModel {model with InputText = input})
     | SelectedFromTimezoneChanged timezone -> SetModel {model with SelectedFromTimezone = timezone}
     | SelectedToTimezoneChanged timezone -> SetModel {model with SelectedToTimezone = timezone}
     | PageChanged page -> {model with Page = page; Output = ""}
@@ -144,12 +138,13 @@ let view (model:Model) (dispatch:Msg -> unit) =
         ImGuiWindowFlags.NoSavedSettings
     
     let gui =
-        match model.Page with
-        | 1 -> 
-            Gui.app [
+        Gui.app [
                 Gui.window "Timezone Converter" flags [
                     
-                    Gui.button "Switch Mode: Offset" (fun () -> PageChanged(2) |> dispatch)
+                    match model.Page with
+                    | 1 -> Gui.button "Switch Mode: Offset" (fun () -> PageChanged(2) |> dispatch)
+                    | 2 -> Gui.button "Switch Mode: Timezone" (fun () -> PageChanged(1) |> dispatch)
+                    | _ -> (fun x -> x)
 
                     Gui.text "Convert"
 
@@ -157,48 +152,48 @@ let view (model:Model) (dispatch:Msg -> unit) =
 
                     Gui.text "From timezone" 
 
-                    Gui.combobox "##from-timezone" (ref model.SelectedFromTimezone) (fun a -> SelectedFromTimezoneChanged(a)|>dispatch) (TimezoneNames model)
+                    match model.Page with
+                    | 1 -> 
+                        Gui.combobox 
+                            "##from-timezone" 
+                            (ref model.SelectedFromTimezone) 
+                            (fun a -> SelectedFromTimezoneChanged(a)|>dispatch) 
+                            (TimezoneNames model)
+                    | 2 -> 
+                        Gui.SliderInt 
+                            "##from-offset" 
+                            (ref model.FromOffset)  
+                            -11 
+                            +12 
+                            (fun a -> FromOffsetChanged(a)|>dispatch) 
+                            (fun a -> FromOffsetChanged(a)|>dispatch)
+                    | _ -> (fun x -> x)
 
                     Gui.text "To timezone"
 
-                    Gui.combobox "##to-timezone" (ref model.SelectedToTimezone) (fun a -> SelectedToTimezoneChanged(a)|>dispatch) (TimezoneNames model)
+                    match model.Page with
+                    | 1 -> 
+                        Gui.combobox 
+                            "##to-timezone" 
+                            (ref model.SelectedToTimezone) 
+                            (fun a -> SelectedToTimezoneChanged(a)|>dispatch) 
+                            (TimezoneNames model)
+                    | 2 -> 
+                        Gui.SliderInt 
+                            "##to-offset" 
+                            (ref model.ToOffset)  
+                            -11 
+                            +12 
+                            (fun a -> ToOffsetChanged(a)|>dispatch) 
+                            (fun a -> ToOffsetChanged(a)|>dispatch) 
+                    | _ -> (fun x -> x)
 
-                    Gui.text ""
-
-                    Gui.text model.Output
+                    Gui.text ("\n" + model.Output)
                 ]
             ]
-        | 2 ->
-            Gui.app [
-                Gui.window "Timezone Converter" flags [
-                
-                    Gui.button "Switch Mode: Timezone" (fun () -> PageChanged(1) |> dispatch)
 
-                    Gui.text "Convert"
-
-                    Gui.InputText "##input" (ref model.InputText) (fun a -> InputTextChanged(a) |> dispatch) (fun a -> InputTextChanged(a) |> dispatch)
-
-                    Gui.text "From timezone" 
-
-                    Gui.SliderInt "##from-offset" (ref model.FromOffset)  -11 +12 (fun a -> FromOffsetChanged(a)|>dispatch) (fun a -> FromOffsetChanged(a)|>dispatch)
-
-                    Gui.text "To timezone"
-
-                    Gui.SliderInt "##to-offset" (ref model.ToOffset)  -11 +12 (fun a -> ToOffsetChanged(a)|>dispatch) (fun a -> ToOffsetChanged(a)|>dispatch) 
-
-                    Gui.text ""
-
-                    Gui.text model.Output
-                ]
-            ]
-        | _ ->
-            Gui.app [
-                Gui.window "Timezone Converter" flags [
-                    Gui.text "Error: Unknown page"
-                ]
-            ]
     startOrUpdateGuiWith "Timezone Converter" gui |> ignore
-    resizeGui(550,180)
+    resizeGui(550,200)
 
 Program.mkSimple init update view
 |> Program.run
