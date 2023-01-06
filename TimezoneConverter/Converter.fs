@@ -1,5 +1,7 @@
 ﻿module Converter
 
+open System
+
 type Sign =
     | Plus
     | Minus
@@ -221,6 +223,20 @@ module Conversions =
     let CalculateTime inputTime fromTimezone toTimezone =       
         let result = convertBetweenTimeOffsets inputTime fromTimezone.Offset toTimezone.Offset
         Some $"{AddLeading0(inputTime.Hours)}:{AddLeading0(inputTime.Minutes)} {fromTimezone.Name} is {AddLeading0(result.Hours)}:{AddLeading0(result.Minutes)} in {toTimezone.Name}"
+
+    let DisplayOffSetWithSign Offset =
+        let sign =
+            match Offset.Sign with
+            | Plus -> "+"
+            | Minus -> "-"
+
+        let offset = Math.Abs(Offset.Hours).ToString()
+
+        "UTC"+sign+offset
+
+    let CalculateTimeBetweenOffsets inputTime fromOffset toOffset =       
+        let result = convertBetweenTimeOffsets inputTime fromOffset toOffset
+        Some $"{AddLeading0(inputTime.Hours)}:{AddLeading0(inputTime.Minutes)} in {DisplayOffSetWithSign(fromOffset)} is {AddLeading0(result.Hours)}:{AddLeading0(result.Minutes)} in {DisplayOffSetWithSign(toOffset)}"
 
     let GetTimezoneFromName (name:string) =
         Timezones.MakeTimezones() 

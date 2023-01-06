@@ -66,6 +66,15 @@ module Gui =
         if var.Value <> oldValue then
             onChange var.Value
 
+    let SliderInt (label:string) (var: int ref) min max onClick onChange = fun () ->
+        let oldValue = var.Value
+
+        if (ImGui.SliderInt(label, &var.contents, min, max)) then
+            onClick var.Value
+
+        if var.Value <> oldValue then
+            onChange var.Value
+
     let combobox label (var: int ref) onClick (items: string array) = fun()->
         let itemCount = items|>Array.length
         
