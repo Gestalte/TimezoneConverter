@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <OutputType>WinExe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Elmish" Version="4.0.0" />
+    <PackageReference Include="ImGui.NET" Version="1.89.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ImGui.NET.FSharp\ImGui.NET.FSharp.fsproj" />
+    <ProjectReference Include="..\TimezoneConverter\TimezoneConverter.fsproj" />
+  </ItemGroup>
+
+</Project>

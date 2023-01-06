@@ -223,8 +223,6 @@ module Conversions =
         Some $"{AddLeading0(inputTime.Hours)}:{AddLeading0(inputTime.Minutes)} {fromTimezone.Name} is {AddLeading0(result.Hours)}:{AddLeading0(result.Minutes)} in {toTimezone.Name}"
 
     let GetTimezoneFromName (name:string) =
-        let tz = 
-            Timezones.MakeTimezones() 
-            |> Array.filter(fun t -> t.Name = name)
-            |> Array.tryHead
-        tz
+        Timezones.MakeTimezones() 
+        |> Array.filter(fun t -> t.Name = name)
+        |> Array.tryHead
