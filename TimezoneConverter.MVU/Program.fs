@@ -97,7 +97,7 @@ let CalcOffset model =
 
     let fOffset:Converter.Offset =
         {
-            Hours = model.FromOffset
+            Hours = Math.Abs(model.FromOffset)
             Minutes = 0
             Sign =
                 match model.FromOffset with
@@ -107,7 +107,7 @@ let CalcOffset model =
 
     let tOffset:Converter.Offset =
         {
-            Hours = model.ToOffset
+            Hours = Math.Abs(model.ToOffset)
             Minutes = 0
             Sign =
                 match model.ToOffset with
@@ -138,12 +138,9 @@ let update (msg: Msg) (model: Model) : Model =
 
 let view (model:Model) (dispatch:Msg -> unit) = 
     let flags = 
-        //ImGuiWindowFlags.NoResize +
         ImGuiWindowFlags.NoMove +
         ImGuiWindowFlags.NoCollapse +
-        //ImGuiWindowFlags.NoBackground +
         ImGuiWindowFlags.NoTitleBar +
-        //ImGuiWindowFlags.NoDecoration +
         ImGuiWindowFlags.NoSavedSettings
     
     let gui =
