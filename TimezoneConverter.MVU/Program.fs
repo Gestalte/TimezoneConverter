@@ -193,7 +193,8 @@ let view (model:Model) (dispatch:Msg -> unit) =
             ]
 
     startOrUpdateGuiWith "Timezone Converter" gui |> ignore
-    resizeGui(550,200)
+    resizeGui(550,250)
+    Styles.setGreenColorScheme()
 
 Program.mkSimple init update view
 |> Program.run
