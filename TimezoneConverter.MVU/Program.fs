@@ -75,21 +75,26 @@ let Calc model =
         | _ -> Converter.Conversions.GetTimezoneFromName (model.Timezones[input-1]).Name
 
     let fromZone = makeZone model.SelectedFromTimezone
-
     let toZone = makeZone model.SelectedToTimezone
 
-    match time with
-    | None->""
-    | Some t -> 
-        match fromZone with
+    let matchStr str =
+        match str with
         | None -> ""
-        | Some f ->
-            match toZone with
-            | None -> ""
-            | Some tt -> 
-                match (Converter.Conversions.CalculateTime t f tt) with
-                | None -> ""
-                | Some out -> out
+        | Some s -> s
+
+    // if timezone is Some, partially apply it to the function.
+    let optionInnerMap (timezone: Converter.Timezone option) func  = 
+        timezone 
+        |> Option.map (fun f -> func f)
+
+    time 
+    |> Option.map (fun t -> Converter.Conversions.CalculateTime t) // time is Some, apply it to CalculateTime
+    |> Option.map (optionInnerMap fromZone) // fromZone is Some, apply it to CalculateTime
+    |> Option.flatten
+    |> Option.map (optionInnerMap toZone) // toZone is Some, apply it to CalculateTime
+    |> Option.flatten
+    |> Option.flatten
+    |> matchStr
 
 let CalcOffset model =
     let time = GetTime model.InputText
@@ -109,11 +114,15 @@ let CalcOffset model =
     let fOffset:Converter.Offset = makeOffset model.FromOffset
     let tOffset:Converter.Offset = makeOffset model.ToOffset
 
-    match time with
+    let final =
+        time 
+        |> Option.map (fun o ->  Converter.Conversions.CalculateTimeBetweenOffsets o fOffset tOffset)
+        |> Option.map (fun o -> o) 
+        |> Option.flatten  
+
+    match final with
     | None -> ""
-    | Some t -> match (Converter.Conversions.CalculateTimeBetweenOffsets t fOffset tOffset) with
-        | None -> ""
-        | Some s -> s
+    | Some s -> s
 
 let SetModel model =
     {model with Output = Calc(model)}
