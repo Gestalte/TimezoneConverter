@@ -163,14 +163,12 @@ module Conversions =
             | true -> amount - maximum
             | false -> amount
     
-    let calculateVector amount maximum =
+    let calculateVector maximum amount  =
         over (under amount maximum) maximum
 
-    let calculateHourVector amount =
-        calculateVector amount 24
+    let calculateHourVector = calculateVector 24
 
-    let calculateMinuteVector amount =
-        calculateVector amount 60
+    let calculateMinuteVector = calculateVector 60
 
     let ConvertToUTCTime time offset =
         let newTime =
@@ -224,15 +222,13 @@ module Conversions =
         let result = convertBetweenTimeOffsets inputTime fromTimezone.Offset toTimezone.Offset
         Some $"{AddLeading0(inputTime.Hours)}:{AddLeading0(inputTime.Minutes)} {fromTimezone.Name} is {AddLeading0(result.Hours)}:{AddLeading0(result.Minutes)} in {toTimezone.Name}"
 
-    let DisplayOffSetWithSign Offset =
+    let DisplayOffSetWithSign offset =
         let sign =
-            match Offset.Sign with
+            match offset.Sign with
             | Plus -> "+"
             | Minus -> "-"
 
-        let offset = Math.Abs(Offset.Hours).ToString()
-
-        "UTC"+sign+offset
+        "UTC" + sign + Math.Abs(offset.Hours).ToString()
 
     let CalculateTimeBetweenOffsets inputTime fromOffset toOffset =       
         let result = convertBetweenTimeOffsets inputTime fromOffset toOffset
