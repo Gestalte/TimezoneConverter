@@ -23,18 +23,18 @@ type Msg =
     | ToOffsetChanged of int
 
 let init() = {
-  InputText = System.DateTime.Now.ToShortTimeString()
-  SelectedFromTimezone = 0
-  SelectedToTimezone = 0
-  Output = ""
-  Timezones = Converter.Timezones.MakeTimezones()
-  Page = 1
-  FromOffset = 0
-  ToOffset = 0
+    InputText = System.DateTime.Now.ToShortTimeString()
+    SelectedFromTimezone = 0
+    SelectedToTimezone = 0
+    Output = ""
+    Timezones = Converter.Timezones.MakeTimezones()
+    Page = 1
+    FromOffset = 0
+    ToOffset = 0
 }
 
 let TimezoneNames model =
-    let headArr = [|""|]
+    let headArr = [|""|] // Used to make a blank line in the combobox.
     let tailArr = model.Timezones |> Array.map(fun a -> a.Name)
     tailArr |> Array.append headArr
 
@@ -45,20 +45,18 @@ let tryParseInt s =
         None
 
 let GetTime (input:string) : Converter.Time Option =
-    let time = input
-    let split = time.Split(':')
-
     let parseTimePart (arr:string array) index =
         try
             tryParseInt arr[index]
-        with :? Exception -> 
+        with :? IndexOutOfRangeException -> 
             None
+            
+    let inputSplit = input.Split(':')
 
-    let hour = parseTimePart split 0
+    let hour = parseTimePart inputSplit 0
+    let minute = parseTimePart inputSplit 1
 
-    let minute = parseTimePart split 1
-
-    if (hour.IsSome=false || minute.IsSome=false) then
+    if (hour.IsSome = false || minute.IsSome = false) then
         None
     else
         Some {
@@ -77,11 +75,6 @@ let Calc model =
     let fromZone = makeZone model.SelectedFromTimezone
     let toZone = makeZone model.SelectedToTimezone
 
-    let matchStr str =
-        match str with
-        | None -> ""
-        | Some s -> s
-
     // if timezone is Some, partially apply it to the function.
     let optionInnerMap (timezone: Converter.Timezone option) func  = 
         timezone 
@@ -94,7 +87,10 @@ let Calc model =
     |> Option.map (optionInnerMap toZone) // toZone is Some, apply it to CalculateTime
     |> Option.flatten
     |> Option.flatten
-    |> matchStr
+    |> (fun str -> 
+        match str with
+        | None -> ""
+        | Some s -> s)  
 
 let CalcOffset model =
     let time = GetTime model.InputText
@@ -114,16 +110,15 @@ let CalcOffset model =
     let fOffset:Converter.Offset = makeOffset model.FromOffset
     let tOffset:Converter.Offset = makeOffset model.ToOffset
 
-    let final =
-        time 
-        |> Option.map (fun o ->  Converter.Conversions.CalculateTimeBetweenOffsets o fOffset tOffset)
-        |> Option.map (fun o -> o) 
-        |> Option.flatten  
-
-    match final with
-    | None -> ""
-    | Some s -> s
-
+    time 
+    |> Option.map (fun o ->  Converter.Conversions.CalculateTimeBetweenOffsets o fOffset tOffset)
+    |> Option.map (fun o -> o) 
+    |> Option.flatten
+    |> (fun f -> 
+        match f with 
+        | None -> ""
+        | Some s -> s)
+    
 let SetModel model =
     {model with Output = Calc(model)}
 
