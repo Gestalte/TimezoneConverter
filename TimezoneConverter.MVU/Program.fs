@@ -107,15 +107,13 @@ let CalcOffset model =
     let fOffset:Converter.Offset = makeOffset model.FromOffset
     let tOffset:Converter.Offset = makeOffset model.ToOffset
 
-    time 
-    |> Option.map (fun o ->  Converter.Conversions.CalculateTimeBetweenOffsets o fOffset tOffset)
-    |> Option.map (fun o -> o) 
-    |> Option.flatten
+    time
+    |> Option.bind(fun t -> Converter.Conversions.CalculateTimeBetweenOffsets t fOffset tOffset)
     |> (fun f -> 
         match f with 
-        | None -> ""
+        | None -> "" 
         | Some s -> s)
-    
+
 let SetModel model =
     {model with Output = Calc(model)}
 
