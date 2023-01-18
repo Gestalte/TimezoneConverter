@@ -34,9 +34,8 @@ let init() = {
 }
 
 let TimezoneNames model =
-    let headArr = [|""|] // Used to make a blank line in the combobox.
-    let tailArr = model.Timezones |> Array.map(fun a -> a.Name)
-    tailArr |> Array.append headArr
+    "" :: (model.Timezones |> Array.map(fun a -> a.Name) |> Array.toList) 
+    |> List.toArray
 
 let tryParseInt s = 
     try 
@@ -80,17 +79,15 @@ let Calc model =
         timezone 
         |> Option.map (fun f -> func f)
 
-    time 
-    |> Option.map (fun t -> Converter.Conversions.CalculateTime t) // time is Some, apply it to CalculateTime
-    |> Option.map (optionInnerMap fromZone) // fromZone is Some, apply it to CalculateTime
+    time
+    |> Option.map (fun t -> Converter.Conversions.CalculateTime t)
+    |> Option.bind (optionInnerMap fromZone)
+    |> Option.bind (optionInnerMap toZone)
     |> Option.flatten
-    |> Option.map (optionInnerMap toZone) // toZone is Some, apply it to CalculateTime
-    |> Option.flatten
-    |> Option.flatten
-    |> (fun str -> 
+    |> (fun str ->
         match str with
         | None -> ""
-        | Some s -> s)  
+        | Some s -> s)
 
 let CalcOffset model =
     let time = GetTime model.InputText

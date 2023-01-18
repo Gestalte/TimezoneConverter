@@ -152,64 +152,54 @@ module Timezones =
     let MakeTimezones() = [| Z(); A(); PST(); PDT(); EST(); EDT(); CET(); CEST(); SAST(); JST() |]
 
 module Conversions =
-
     let under amount maximum =
         match amount < 0 with
-            | true ->  amount + maximum
-            | false -> amount
+        | true ->  amount + maximum
+        | false -> amount
 
     let over amount maximum = 
         match amount >= maximum with
-            | true -> amount - maximum
-            | false -> amount
+        | true -> amount - maximum
+        | false -> amount
     
     let calculateVector maximum amount  =
         over (under amount maximum) maximum
 
     let calculateHourVector = calculateVector 24
-
     let calculateMinuteVector = calculateVector 60
 
     let ConvertToUTCTime time offset =
-        let newTime =
-            match offset.Sign with
-                | Plus ->
-                    {
-                        Hours = calculateHourVector (time.Hours - offset.Hours)
-                        Minutes = calculateMinuteVector (time.Minutes - offset.Minutes)
-                    }
-                | Minus -> 
-                    {
-                        Hours = calculateHourVector (time.Hours + offset.Hours)
-                        Minutes = calculateMinuteVector (time.Minutes + offset.Minutes)
-                    }
-        newTime
+        match offset.Sign with
+            | Plus ->
+                {
+                    Hours = calculateHourVector (time.Hours - offset.Hours)
+                    Minutes = calculateMinuteVector (time.Minutes - offset.Minutes)
+                }
+            | Minus -> 
+                {
+                    Hours = calculateHourVector (time.Hours + offset.Hours)
+                    Minutes = calculateMinuteVector (time.Minutes + offset.Minutes)
+                }
 
     let ConvertUCTToOther uctTime targetTimeZoneOffset =
-        let newTime =
-            match targetTimeZoneOffset.Sign with
-                | Plus ->
-                    {
-                        Hours = calculateHourVector (uctTime.Hours + targetTimeZoneOffset.Hours)
-                        Minutes = calculateMinuteVector (uctTime.Minutes + targetTimeZoneOffset.Minutes)
-                    }
-                | Minus -> 
-                    {
-                        Hours = calculateHourVector (uctTime.Hours - targetTimeZoneOffset.Hours)
-                        Minutes = calculateMinuteVector (uctTime.Minutes - targetTimeZoneOffset.Minutes)
-                    }
-        newTime
+        match targetTimeZoneOffset.Sign with
+            | Plus ->
+                {
+                    Hours = calculateHourVector (uctTime.Hours + targetTimeZoneOffset.Hours)
+                    Minutes = calculateMinuteVector (uctTime.Minutes + targetTimeZoneOffset.Minutes)
+                }
+            | Minus -> 
+                {
+                    Hours = calculateHourVector (uctTime.Hours - targetTimeZoneOffset.Hours)
+                    Minutes = calculateMinuteVector (uctTime.Minutes - targetTimeZoneOffset.Minutes)
+                }
 
     let convertBetweenTimeZones time fromZone toZone =
-        let uctTime = 
-            ConvertToUTCTime time fromZone.Offset
-        
+        let uctTime = ConvertToUTCTime time fromZone.Offset
         ConvertUCTToOther uctTime toZone.Offset
 
     let convertBetweenTimeOffsets time fromOffset toOffset =
-        let uctTime = 
-            ConvertToUTCTime time fromOffset
-
+        let uctTime = ConvertToUTCTime time fromOffset
         ConvertUCTToOther uctTime toOffset
     
     let AddLeading0 timePart =
