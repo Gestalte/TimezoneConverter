@@ -29,7 +29,7 @@ type Time =
 
 module Timezones =
 
-    let A() = { 
+    let A = { 
         Name = "Alpha"
         Abbreviation = "A"
         Location = "Military"
@@ -41,7 +41,7 @@ module Timezones =
         }
     }
 
-    let Z() = { 
+    let Z = { 
         Name = "Zulu Time"
         Abbreviation = "Z"
         Location = "Military"
@@ -53,7 +53,7 @@ module Timezones =
         }
     }
 
-    let SAST() = { 
+    let SAST = { 
         Name = "South African Standard Time"
         Abbreviation = "SAST"
         Location = "South Africa"
@@ -65,7 +65,7 @@ module Timezones =
         }
     }
 
-    let JST() = { 
+    let JST = { 
         Name = "Japan Standard Time"
         Abbreviation = "JST"
         Location = "Japan"
@@ -77,7 +77,7 @@ module Timezones =
         }
     }
 
-    let EST() = { 
+    let EST = { 
         Name = "Eastern Standard Time"
         Abbreviation = "EST"
         Location = "Eastern United States"
@@ -89,7 +89,7 @@ module Timezones =
         }
     }
 
-    let EDT() = { 
+    let EDT = { 
         Name = "Eastern Daylight Time"
         Abbreviation = "EDT"
         Location = "Eastern United States"
@@ -101,7 +101,7 @@ module Timezones =
         }
     }
 
-    let PST() = { 
+    let PST = { 
         Name = "Pacific Standard Time "
         Abbreviation = "PST"
         Location = "Western United States"
@@ -113,7 +113,7 @@ module Timezones =
         }
     }
 
-    let PDT() = { 
+    let PDT = { 
         Name = "Pacific Daylight Time"
         Abbreviation = "PDT"
         Location = "Western United States"
@@ -125,7 +125,7 @@ module Timezones =
         }
     }
 
-    let CET() = { 
+    let CET = { 
         Name = "Central European Time"
         Abbreviation = "CET"
         Location = "Central Europe"
@@ -137,7 +137,7 @@ module Timezones =
         }
     }
 
-    let CEST() = { 
+    let CEST = { 
         Name = "Central European Summer Time"
         Abbreviation = "CEST"
         Location = "Central Europe"
@@ -149,7 +149,7 @@ module Timezones =
         }
     }
 
-    let MakeTimezones() = [| Z(); A(); PST(); PDT(); EST(); EDT(); CET(); CEST(); SAST(); JST() |]
+    let Timezones = [| Z; A; PST; PDT; EST; EDT; CET; CEST; SAST; JST |]
 
 module Conversions =
     let under amount maximum =
@@ -225,6 +225,6 @@ module Conversions =
         Some $"{AddLeading0(inputTime.Hours)}:{AddLeading0(inputTime.Minutes)} in {DisplayOffSetWithSign(fromOffset)} is {AddLeading0(result.Hours)}:{AddLeading0(result.Minutes)} in {DisplayOffSetWithSign(toOffset)}"
 
     let GetTimezoneFromName (name:string) =
-        Timezones.MakeTimezones() 
+        Timezones.Timezones
         |> Array.filter(fun t -> t.Name = name)
         |> Array.tryHead
