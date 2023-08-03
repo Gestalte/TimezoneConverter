@@ -23,11 +23,6 @@ module Gui =
             windowsMode()
             ImGui.End()
 
-    //let window label (builder:#seq<ImGuiBuilder>) = fun () ->
-    //    if (ImGui.Begin(label)) then
-    //        runSeq builder
-    //        ImGui.End()
-
     let mainMenuBar (menus:#seq<ImGuiBuilder>) = fun () ->
         if ImGui.BeginMainMenuBar() then
             runSeq menus
