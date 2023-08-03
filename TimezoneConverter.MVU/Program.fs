@@ -122,7 +122,7 @@ let SetModelOffset model =
 
 let update (msg: Msg) (model: Model) : Model =    
     match msg with 
-    | InputTextChanged input -> SetModelOffset( SetModel {model with InputText = input})
+    | InputTextChanged input ->  SetModel {model with InputText = input}
     | SelectedFromTimezoneChanged timezone -> SetModel {model with SelectedFromTimezone = timezone}
     | SelectedToTimezoneChanged timezone -> SetModel {model with SelectedToTimezone = timezone}
     | PageChanged page -> {model with Page = page; Output = ""}
