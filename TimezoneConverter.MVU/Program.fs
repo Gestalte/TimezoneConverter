@@ -63,23 +63,21 @@ let GetTime (input:string) : Converter.Time Option =
             Minutes = minute.Value
         }
 
-let Calc model =
-    let time = GetTime model.InputText
-
+let CalculateOutputUsingTimezones model =   
     let makeZone input =
         match input with
         | 0 -> None
-        | _ -> Converter.Conversions.GetTimezoneFromName (model.Timezones[input-1]).Name
+        | input when input > 0 -> Converter.Conversions.GetTimezoneFromName (model.Timezones[input-1]).Name
+        | _ -> None
 
     let fromZone = makeZone model.SelectedFromTimezone
     let toZone = makeZone model.SelectedToTimezone
 
     // if timezone is Some, partially apply it to the function.
     let optionInnerMap (timezone: Converter.Timezone option) func  = 
-        timezone 
-        |> Option.map (fun f -> func f)
+        Option.map (fun f -> func f) timezone
 
-    time
+    GetTime model.InputText
     |> Option.map (fun t -> Converter.Conversions.CalculateTime t)
     |> Option.bind (optionInnerMap fromZone)
     |> Option.bind (optionInnerMap toZone)
@@ -89,45 +87,40 @@ let Calc model =
         | None -> ""
         | Some s -> s)
 
-let CalcOffset model =
-    let time = GetTime model.InputText
+let makeOffset (input:int) :Converter.Offset =
+    {
+        Hours = Math.Abs(input)
+        Minutes = 0
+        Sign = match input with
+                | a when a >= 0 -> Converter.Sign.Plus
+                | _ -> Converter.Sign.Minus
+    }
 
-    let getSign offset =
-        match offset with
-        | a when a >= 0 -> Converter.Sign.Plus
-        | _ -> Converter.Sign.Minus
-
-    let makeOffset (input:int) :Converter.Offset =
-        {
-            Hours = Math.Abs(input)
-            Minutes = 0
-            Sign = getSign input
-        }
-
+let CalculateOutputUsingOffsets model =
     let fOffset:Converter.Offset = makeOffset model.FromOffset
     let tOffset:Converter.Offset = makeOffset model.ToOffset
 
-    time
+    GetTime model.InputText
     |> Option.bind(fun t -> Converter.Conversions.CalculateTimeBetweenOffsets t fOffset tOffset)
     |> (fun f -> 
         match f with 
         | None -> "" 
         | Some s -> s)
 
-let SetModel model =
-    {model with Output = Calc(model)}
+let SetModelBasedOnTimezone model =
+    {model with Output = CalculateOutputUsingTimezones(model)}
 
-let SetModelOffset model =
-    {model with Output = CalcOffset(model)}
+let SetModelBasedOnOffset model =
+    {model with Output = CalculateOutputUsingOffsets(model)}
 
 let update (msg: Msg) (model: Model) : Model =    
     match msg with 
-    | InputTextChanged input ->  SetModel {model with InputText = input}
-    | SelectedFromTimezoneChanged timezone -> SetModel {model with SelectedFromTimezone = timezone}
-    | SelectedToTimezoneChanged timezone -> SetModel {model with SelectedToTimezone = timezone}
-    | PageChanged page -> {model with Page = page; Output = ""}
-    | FromOffsetChanged offset -> SetModelOffset {model with FromOffset = offset}
-    | ToOffsetChanged offset -> SetModelOffset {model with ToOffset = offset}    
+    | InputTextChanged input ->  SetModelBasedOnTimezone {model with InputText = input}
+    | SelectedFromTimezoneChanged timezone -> SetModelBasedOnTimezone {model with SelectedFromTimezone = timezone}
+    | SelectedToTimezoneChanged timezone -> SetModelBasedOnTimezone {model with SelectedToTimezone = timezone}
+    | PageChanged page -> {model with Page = page}
+    | FromOffsetChanged offset -> SetModelBasedOnOffset {model with FromOffset = offset}
+    | ToOffsetChanged offset -> SetModelBasedOnOffset {model with ToOffset = offset}    
 
 let view (model:Model) (dispatch:Msg -> unit) = 
     let flags = 
