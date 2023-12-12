@@ -173,7 +173,7 @@ module Timezones =
         }
     }
 
-    let Timezones = [| Z; A; PST; PDT; EST; EDT; CET; CEST; SAST; JST |]
+    let Timezones = [| A; CDT; CET; CST; CEST; EDT; EST; JST; PDT;  PST; SAST; Z |]
 
 module Conversions =
     let under amount maximum =
