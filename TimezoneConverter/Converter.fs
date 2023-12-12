@@ -53,6 +53,30 @@ module Timezones =
         }
     }
 
+    let CST = {
+        Name = "Central Standard Time"
+        Abbreviation = "CST"
+        Location = "Central United States and Canada"
+        Offset = 
+        {
+            Sign = Minus
+            Hours = 6
+            Minutes = 0
+        }
+    }
+
+    let CDT = {
+        Name = "Central Daylight Time"
+        Abbreviation = "CDT"
+        Location = "Central United States and Canada"
+        Offset = 
+        {
+            Sign = Minus
+            Hours = 6
+            Minutes = 0
+        }
+    }
+
     let EST = { 
         Name = "Eastern Standard Time"
         Abbreviation = "EST"
