@@ -29,50 +29,26 @@ type Time =
 
 module Timezones =
 
-    let A = { 
-        Name = "Alpha"
-        Abbreviation = "A"
-        Location = "Military"
-        Offset =
-        { 
-            Sign=Plus
-            Hours = 1
-            Minutes = 0
-        }
-    }
-
-    let Z = { 
-        Name = "Zulu Time"
-        Abbreviation = "Z"
-        Location = "Military"
-        Offset =
-        { 
-            Sign=Minus
-            Hours = 0
-            Minutes = 0
-        }
-    }
-
-    let SAST = { 
-        Name = "South African Standard Time"
-        Abbreviation = "SAST"
-        Location = "South Africa"
-        Offset =
-        { 
-            Sign=Plus
-            Hours = 2
-            Minutes = 0
-        }
-    }
-
-    let JST = { 
-        Name = "Japan Standard Time"
-        Abbreviation = "JST"
-        Location = "Japan"
+    let PST = { 
+        Name = "Pacific Standard Time "
+        Abbreviation = "PST"
+        Location = "Western United States"
         Offset =
         {
-            Sign=Plus
-            Hours = 9
+            Sign=Minus
+            Hours = 8
+            Minutes = 0
+        }
+    }
+
+    let PDT = { 
+        Name = "Pacific Daylight Time"
+        Abbreviation = "PDT"
+        Location = "Western United States"
+        Offset =
+        {
+            Sign=Minus
+            Hours = 7
             Minutes = 0
         }
     }
@@ -101,26 +77,26 @@ module Timezones =
         }
     }
 
-    let PST = { 
-        Name = "Pacific Standard Time "
-        Abbreviation = "PST"
-        Location = "Western United States"
+    let Z = { 
+        Name = "Zulu Time"
+        Abbreviation = "Z"
+        Location = "Military"
         Offset =
-        {
+        { 
             Sign=Minus
-            Hours = 8
+            Hours = 0
             Minutes = 0
         }
     }
 
-    let PDT = { 
-        Name = "Pacific Daylight Time"
-        Abbreviation = "PDT"
-        Location = "Western United States"
+    let A = { 
+        Name = "Alpha"
+        Abbreviation = "A"
+        Location = "Military"
         Offset =
-        {
-            Sign=Minus
-            Hours = 7
+        { 
+            Sign=Plus
+            Hours = 1
             Minutes = 0
         }
     }
@@ -144,8 +120,32 @@ module Timezones =
         Offset = 
         { 
             Sign = Plus; 
-            Hours = 2; 
+            Hours = 2;
             Minutes = 0; 
+        }
+    }
+
+    let SAST = { 
+        Name = "South African Standard Time"
+        Abbreviation = "SAST"
+        Location = "South Africa"
+        Offset =
+        { 
+            Sign=Plus
+            Hours = 2
+            Minutes = 0
+        }
+    }
+
+    let JST = { 
+        Name = "Japan Standard Time"
+        Abbreviation = "JST"
+        Location = "Japan"
+        Offset =
+        {
+            Sign=Plus
+            Hours = 9
+            Minutes = 0
         }
     }
 
