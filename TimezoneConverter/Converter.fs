@@ -234,7 +234,9 @@ module Conversions =
 
     let CalculateTime inputTime fromTimezone toTimezone =       
         let result = convertBetweenTimeOffsets inputTime fromTimezone.Offset toTimezone.Offset
-        Some $"{AddLeading0(inputTime.Hours)}:{AddLeading0(inputTime.Minutes)} {fromTimezone.Name} is {AddLeading0(result.Hours)}:{AddLeading0(result.Minutes)} in {toTimezone.Name}"
+        let fromTime = $"{AddLeading0(inputTime.Hours)}:{AddLeading0(inputTime.Minutes)}"
+        let toTime = $"{AddLeading0(result.Hours)}:{AddLeading0(result.Minutes)}"
+        Some $"{fromTime} {fromTimezone.Name} is {toTime} in {toTimezone.Name}"
 
     let DisplayOffSetWithSign offset =
         let sign =
@@ -246,7 +248,9 @@ module Conversions =
 
     let CalculateTimeBetweenOffsets inputTime fromOffset toOffset =       
         let result = convertBetweenTimeOffsets inputTime fromOffset toOffset
-        Some $"{AddLeading0(inputTime.Hours)}:{AddLeading0(inputTime.Minutes)} in {DisplayOffSetWithSign(fromOffset)} is {AddLeading0(result.Hours)}:{AddLeading0(result.Minutes)} in {DisplayOffSetWithSign(toOffset)}"
+        let fromTime = $"{AddLeading0(inputTime.Hours)}:{AddLeading0(inputTime.Minutes)}"
+        let toTime = $"{AddLeading0(result.Hours)}:{AddLeading0(result.Minutes)}"
+        Some $"{fromTime} in {DisplayOffSetWithSign(fromOffset)} is {toTime} in {DisplayOffSetWithSign(toOffset)}"
 
     let GetTimezoneFromName (name:string) =
         Timezones.Timezones
